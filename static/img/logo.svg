@@ -1,1 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" fill="none" role="img" aria-label="FactoryBrain logo">
+  <defs>
+    <linearGradient id="fbSteelLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#aab4c2"/>
+      <stop offset="1" stop-color="#5a6675"/>
+    </linearGradient>
+    <linearGradient id="fbSteelDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4654"/>
+      <stop offset="1" stop-color="#11161d"/>
+    </linearGradient>
+    <radialGradient id="fbBrain" cx="42%" cy="40%" r="70%">
+      <stop offset="0" stop-color="#5b9bf0"/>
+      <stop offset="45%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#0a2a6e"/>
+    </radialGradient>
+  </defs>
 
+  <!-- center divider -->
+  <line x1="120" y1="30" x2="120" y2="158" stroke="#9aa6b6" stroke-width="2" opacity=".5"/>
+
+  <!-- ===================== LEFT : FACTORY ===================== -->
+  <!-- smoke -->
+  <g fill="#9aa3ad">
+    <circle cx="58" cy="34" r="9"/>
+    <circle cx="71" cy="27" r="7"/>
+    <circle cx="46" cy="28" r="6"/>
+    <circle cx="62" cy="22" r="5"/>
+  </g>
+
+  <!-- back angled chimney -->
+  <path d="M84 60 L92 60 L98 150 L88 150 Z" fill="url(#fbSteelDark)"/>
+  <!-- main smokestack -->
+  <path d="M50 44 L62 44 L66 150 L50 150 Z" fill="url(#fbSteelDark)"/>
+  <rect x="51" y="56" width="13.5" height="6" fill="#e9edf2" transform="skewY(2)"/>
+  <rect x="52" y="72" width="13.5" height="6" fill="#e9edf2" transform="skewY(2)"/>
+
+  <!-- tall back building -->
+  <path d="M70 86 L104 86 L104 150 L70 150 Z" fill="url(#fbSteelDark)"/>
+  <path d="M70 86 L104 86 L104 92 L70 92 Z" fill="#8a97a6"/>
+  <!-- mid building with slanted roof -->
+  <path d="M30 104 L70 96 L70 150 L30 150 Z" fill="url(#fbSteelLight)"/>
+  <!-- front low building -->
+  <path d="M16 120 L48 120 L48 150 L16 150 Z" fill="url(#fbSteelDark)"/>
+
+  <!-- windows: tall back building -->
+  <g fill="#dfe6ee">
+    <rect x="78" y="104" width="7" height="12"/><rect x="90" y="104" width="7" height="12"/>
+    <rect x="78" y="124" width="7" height="12"/><rect x="90" y="124" width="7" height="12"/>
+  </g>
+  <!-- windows: mid building -->
+  <g fill="#2b3440">
+    <rect x="38" y="116" width="6" height="9"/><rect x="48" y="114" width="6" height="9"/><rect x="58" y="112" width="6" height="9"/>
+    <rect x="38" y="132" width="6" height="9"/><rect x="48" y="130" width="6" height="9"/><rect x="58" y="128" width="6" height="9"/>
+  </g>
+  <!-- windows: front building -->
+  <g fill="#dfe6ee">
+    <rect x="21" y="130" width="5" height="7"/><rect x="30" y="130" width="5" height="7"/><rect x="39" y="130" width="5" height="7"/>
+  </g>
+
+  <!-- ground base slab (perspective) -->
+  <path d="M10 150 L112 150 L104 164 L18 164 Z" fill="url(#fbSteelDark)"/>
+
+  <!-- ===================== RIGHT : BRAIN ===================== -->
+  <!-- hemisphere outline with lobed bumps + pointed temporal tip -->
+  <path d="M122 158
+           V70
+           C122 54 132 44 146 47
+           C150 33 166 31 172 41
+           C184 36 198 44 196 57
+           C210 56 218 70 210 81
+           C220 88 219 104 207 107
+           C212 119 202 132 189 128
+           C186 142 172 146 162 140
+           C158 152 150 166 144 168
+           C141 160 139 152 137 147
+           C131 150 125 150 122 158 Z" fill="url(#fbBrain)"/>
+
+  <!-- gyri / folds -->
+  <g stroke="#16307a" stroke-width="2.6" fill="none" opacity=".5" stroke-linecap="round">
+    <path d="M138 56 q12 6 6 18"/>
+    <path d="M158 44 q10 8 4 18"/>
+    <path d="M180 50 q12 6 6 18"/>
+    <path d="M150 78 q14 4 10 18"/>
+    <path d="M176 80 q14 6 8 20"/>
+    <path d="M140 104 q14 4 12 18"/>
+    <path d="M168 112 q12 6 8 18"/>
+    <path d="M134 128 q10 5 9 16"/>
+  </g>
+
+  <!-- circuit traces -->
+  <g stroke="#8ed3ff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M150 66 h16 v-10"/>
+    <path d="M170 84 h18 v-12"/>
+    <path d="M156 100 h14 v12"/>
+    <path d="M186 100 h12"/>
+    <path d="M150 120 h20"/>
+  </g>
+  <!-- circuit nodes -->
+  <g fill="#bfe6ff">
+    <circle cx="150" cy="66" r="3.4"/>
+    <circle cx="166" cy="56" r="3.4"/>
+    <circle cx="170" cy="84" r="3.4"/>
+    <circle cx="188" cy="72" r="3.4"/>
+    <circle cx="170" cy="112" r="3.4"/>
+    <circle cx="198" cy="100" r="3.4"/>
+    <circle cx="150" cy="120" r="3.4"/>
+  </g>
+</svg>
