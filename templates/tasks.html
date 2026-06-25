@@ -1,0 +1,45 @@
+{% extends "shell.html" %}
+{% set active = 'tasks' %}
+{% block title %}My Tasks · FactoryBrain{% endblock %}
+
+{% block content %}
+{% set done = tasks|selectattr('done')|list|length %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('tasks.title') }}</h1>
+    <p>{{ t('tasks.subtitle2') }}</p>
+  </div>
+</div>
+
+{% if tasks %}
+<div class="card mb-2">
+  <div class="row-between" style="margin-bottom:12px">
+    <b>{{ t('tasks.progress') }}</b>
+    <span class="muted text-sm">{{ done }} / {{ tasks|length }} {{ t('tasks.complete') }}</span>
+  </div>
+  <div class="bar"><span style="width: {{ (done / tasks|length * 100)|round }}%"></span></div>
+</div>
+
+{% for task in tasks %}
+<div class="task-item {{ 'done' if task.done }}">
+  <div class="task-check {{ 'checked' if task.done }}" onclick="toggleTask({{ task.id }}, this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <div style="flex:1">
+    <div class="task-title">{{ task.title }}</div>
+    <div class="task-meta">
+      {% if task.category %}<span class="task-cat">{{ task.category }}</span>{% endif %}
+      {% if task.details %} · {{ task.details }}{% endif %}
+      {% if task.due_date %} · {{ t('tasks.due') }} {{ task.due_date[:10] }}{% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  <h3>{{ t('tasks.no_tasks_title') }}</h3>
+  <p>{{ t('tasks.no_tasks_sub') }}</p>
+</div>
+{% endif %}
+{% endblock %}

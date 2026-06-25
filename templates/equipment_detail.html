@@ -1,0 +1,60 @@
+{% extends "shell.html" %}
+{% set active = 'equipment' %}
+{% block title %}{{ name }} · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <a href="{{ url_for('equipment_list') }}" class="text-sm muted" style="display:inline-block;margin-bottom:8px">{{ t('eq.back') }}</a>
+    <h1>{{ name }}</h1>
+    <p>{{ items|length }} {{ t('eq.recorded_faults') }} · {{ incidents|length }} {{ t('eq.logged_incidents') }}</p>
+  </div>
+</div>
+
+<div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg> {{ t('eq.faults_solutions') }}</div>
+{% if items %}
+<div class="grid grid-2 mb-2">
+  {% for k in items %}
+  <div class="k-card">
+    <div class="k-top">
+      <h3>{{ k.problem_type }}</h3>
+      <span class="chip sev-{{ k.severity }}">{{ t('sev.' + k.severity) }}</span>
+    </div>
+    <div class="k-label">{{ t('field.cause') }}</div>
+    <div class="k-cause">{{ k.problem_cause }}</div>
+    {% if k.solution_steps %}
+    <div class="k-label">{{ t('field.solution_steps') }}</div>
+    <ol class="k-steps">{% for s in k.solution_steps %}<li>{{ s }}</li>{% endfor %}</ol>
+    {% endif %}
+    <div class="k-foot">
+      <span class="k-author">{{ t('eq.by') }} {{ k.author or 'Unknown' }} · {{ k.created_at }}</span>
+      {% if k.rating_count %}<span class="rating-meta">★ {{ k.avg_rating }} ({{ k.rating_count }})</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty" style="margin-bottom:24px"><p>{{ t('eq.no_faults') }}</p></div>
+{% endif %}
+
+<div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.3 2 17a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> {{ t('eq.incident_history') }}</div>
+{% if incidents %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>{{ t('eq.date') }}</th><th>{{ t('inc.description') }}</th><th>{{ t('inc.downtime') }}</th><th>{{ t('inc.status') }}</th></tr></thead>
+    <tbody>
+    {% for i in incidents %}
+      <tr>
+        <td class="text-sm">{{ i.created_at[:10] }}</td>
+        <td>{{ i.description }}{% if i.solution_used %}<br><span class="text-xs muted">{{ t('inc.fix') }}: {{ i.solution_used }}</span>{% endif %}</td>
+        <td class="text-sm">{{ i.downtime_minutes }} {{ t('inc.minutes') }}</td>
+        <td><span class="chip st-{{ i.status }}">{{ t('inc.open') if i.status == 'open' else t('inc.closed') }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty"><p>{{ t('eq.no_incidents') }}</p></div>
+{% endif %}
+{% endblock %}

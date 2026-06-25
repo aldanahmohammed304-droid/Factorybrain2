@@ -1,0 +1,76 @@
+{% extends "shell.html" %}
+{% set active = 'ask' %}
+{% block title %}Ask AI · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('ask.title') }}</h1>
+    <p>{{ t('ask.subtitle') }}</p>
+  </div>
+  {% if AI_READY %}<span class="badge badge-ai-on"><span class="dot"></span> {{ t('add.connected') }}</span>
+  {% else %}<span class="badge badge-ai-off"><span class="dot"></span> {{ t('add.not_connected') }}</span>{% endif %}
+</div>
+
+<div class="ask-wrap">
+  <div class="ask-box">
+    <textarea id="question" rows="2" placeholder="{{ t('ask.placeholder') }}" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askAI();}"></textarea>
+    <button class="btn btn-primary" id="askBtn" onclick="askAI()" style="align-self:stretch;min-width:110px">
+      <span class="btn-label">{{ t('ask.send') }}</span>
+    </button>
+  </div>
+
+  <div id="answerArea"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const I18N = {
+  send: {{ t('ask.send')|tojson }},
+  thinking: {{ t('ask.thinking')|tojson }},
+  searching: {{ t('ask.thinking')|tojson }},
+  sources: {{ t('ask.sources')|tojson }}
+};
+
+async function askAI() {
+  const q = document.getElementById('question').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('askBtn');
+  const area = document.getElementById('answerArea');
+  setLoading(btn, true, '…');
+  area.innerHTML = `<div class="answer-card"><div class="flex items-center gap-2"><span class="spinner spinner-dark"></span><span class="muted">${esc(I18N.searching)}</span></div></div>`;
+
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ question: q })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    let sources = '';
+    if (data.sources && data.sources.length) {
+      sources = `<div class="sources"><div class="s-label">${esc(I18N.sources)}</div>` +
+        data.sources.map(s => `<a href="/equipment/${encodeURIComponent(s.equipment)}" class="source-pill"><b>${esc(s.equipment)}</b> · ${esc(s.problem)}</a>`).join('') +
+        `</div>`;
+    }
+
+    area.innerHTML = `
+      <div class="answer-card">
+        <div class="a-head">
+          <span class="mark"><svg viewBox="0 0 32 32" fill="none"><path d="M5 23V12l5 2.5V10l5 2.5V8l2 15z" fill="#cbd5e1"/><path d="M19 8c5 0 8 3.5 8 8s-3.5 7.5-8 7.5L16 8z" fill="#38BDF8"/></svg></span>
+          <b>FactoryBrain</b>
+        </div>
+        <div class="answer-text">${esc(data.answer)}</div>
+        ${sources}
+      </div>`;
+  } catch (e) {
+    area.innerHTML = `<div class="answer-card"><div class="answer-text" style="color:var(--danger)">Error: ${esc(e.message)}</div></div>`;
+  } finally {
+    setLoading(btn, false, I18N.send);
+  }
+}
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+</script>
+{% endblock %}

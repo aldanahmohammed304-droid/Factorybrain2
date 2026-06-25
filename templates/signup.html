@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "base.html" import logo_mark %}
+{% block title %}Create Account · FactoryBrain{% endblock %}
+
+{% block body %}
+<div class="auth-wrap">
+  <a class="lang-toggle auth-lang" href="{{ url_for('set_lang', lang='ar' if LANG == 'en' else 'en') }}">🌐 {{ t('language') }}</a>
+  <div class="auth-side">
+    <svg class="circuit" viewBox="0 0 200 200" fill="none" stroke="#38BDF8" stroke-width="1.2">
+      <circle cx="100" cy="100" r="60" opacity=".4"/>
+      <path d="M100 40v20M100 140v20M40 100h20M140 100h20M58 58l14 14M128 128l14 14M142 58l-14 14M72 128l-14 14"/>
+      <circle cx="100" cy="60" r="3" fill="#38BDF8"/><circle cx="100" cy="140" r="3" fill="#38BDF8"/>
+      <circle cx="60" cy="100" r="3" fill="#38BDF8"/><circle cx="140" cy="100" r="3" fill="#38BDF8"/>
+    </svg>
+    <div class="content">
+      <div class="brand light"><span class="mark">{{ logo_mark() }}</span><span style="color:#fff">Factory<span style="color:#38BDF8">Brain</span></span></div>
+      <h1>{{ t('auth.hero_title_signup') }} <span class="accent">{{ t('auth.hero_accent_signup') }}</span> {{ t('auth.hero_title_signup2') }}</h1>
+      <p class="lead">{{ t('auth.hero_lead_signup') }}</p>
+    </div>
+    <div class="auth-feats">
+      <div class="auth-feat"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span><div><b>{{ t('auth.feat_share') }}</b><p>{{ t('auth.feat_share_d') }}</p></div></div>
+      <div class="auth-feat"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M2 20h20M4 20V9l5 3V8l5 3V7l5 3v10"/></svg></span><div><b>{{ t('auth.feat_history') }}</b><p>{{ t('auth.feat_history_d') }}</p></div></div>
+    </div>
+  </div>
+
+  <div class="auth-main">
+    <div class="auth-card">
+      <h2>{{ t('auth.create_title') }}</h2>
+      <p class="sub">{{ t('auth.create_sub') }}</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('signup') }}">
+        <div class="field">
+          <label>{{ t('auth.full_name') }}</label>
+          <input type="text" name="name" placeholder="Ahmed Al-Salem" required autofocus>
+        </div>
+        <div class="field">
+          <label>{{ t('auth.email') }}</label>
+          <input type="email" name="email" placeholder="you@company.com" required>
+        </div>
+        <div class="field">
+          <label>{{ t('auth.job_title') }} <span class="muted text-xs">({{ t('optional') }})</span></label>
+          <input type="text" name="job_title" placeholder="Maintenance Technician">
+        </div>
+        <div class="field">
+          <label>{{ t('auth.password') }}</label>
+          <input type="password" name="password" placeholder="{{ t('auth.choose_password') }}" required
+                 minlength="6" pattern="(?=.*[A-Z]).{6,}" title="{{ t('auth.password_hint') }}">
+          <span class="muted text-xs">{{ t('auth.password_hint') }}</span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">{{ t('auth.create_account') }}</button>
+      </form>
+
+      <p class="auth-switch">{{ t('auth.already') }} <a href="{{ url_for('login') }}">{{ t('auth.signin_link') }}</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

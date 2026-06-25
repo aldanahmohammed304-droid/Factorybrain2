@@ -1,0 +1,81 @@
+{% extends "shell.html" %}
+{% set active = 'atasks' %}
+{% block title %}Assign Tasks · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('adm.assign_daily') }}</h1>
+    <p>{{ t('adm.tasks_sub') }}</p>
+  </div>
+</div>
+
+<div class="grid grid-2" style="align-items:start">
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg> {{ t('adm.new_task') }}</div>
+    {% if users %}
+    <div class="field">
+      <label>{{ t('adm.assign_to') }}</label>
+      <select id="taskUser">
+        {% for u in users %}<option value="{{ u.id }}">{{ u.name }}{% if u.job_title %} — {{ u.job_title }}{% endif %}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>{{ t('adm.category') }}</label>
+      <select id="taskCategory">
+        <option value="Inspection">{{ t('adm.cat_inspection') }}</option><option value="Training">{{ t('adm.cat_training') }}</option><option value="Operation">{{ t('adm.cat_operation') }}</option><option value="Follow-up">{{ t('adm.cat_followup') }}</option>
+      </select>
+    </div>
+    <div class="field"><label>{{ t('adm.task_title') }}</label><input id="taskTitle" placeholder="{{ t('adm.task_title_ph') }}"></div>
+    <div class="field"><label>{{ t('adm.details') }} <span class="muted text-xs">({{ t('optional') }})</span></label><textarea id="taskDetails" rows="2" placeholder="{{ t('adm.steps_notes') }}"></textarea></div>
+    <div class="field"><label>{{ t('adm.due_date') }} <span class="muted text-xs">({{ t('optional') }})</span></label><input type="date" id="taskDue"></div>
+    <button class="btn btn-primary btn-block" onclick="assignTask()"><span class="btn-label">{{ t('adm.assign') }}</span></button>
+    <p id="taskMsg" class="text-sm mt-1" style="text-align:center"></p>
+    {% else %}
+    <p class="muted text-sm">{{ t('adm.no_emp_signup') }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg> {{ t('adm.recently_assigned') }}</div>
+    {% if tasks %}
+    <table class="table">
+      <thead><tr><th>{{ t('adm.employee') }}</th><th>{{ t('adm.task') }}</th><th>{{ t('adm.status') }}</th></tr></thead>
+      <tbody>
+      {% for task in tasks %}
+        <tr>
+          <td class="text-sm"><b>{{ task.uname }}</b></td>
+          <td><span class="task-cat">{{ task.category }}</span> {{ task.title }}</td>
+          <td><span class="chip {{ 'st-closed' if task.done else 'st-open' }}">{{ t('adm.done') if task.done else t('adm.pending') }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted text-sm">{{ t('adm.no_tasks') }}</p>{% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const I18N = { enter_title: {{ t('adm.enter_title')|tojson }}, assigned: {{ t('adm.task_assigned')|tojson }} };
+async function assignTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { alert(I18N.enter_title); return; }
+  const payload = {
+    user_id: document.getElementById('taskUser').value,
+    category: document.getElementById('taskCategory').value,
+    title: title,
+    details: document.getElementById('taskDetails').value.trim(),
+    due_date: document.getElementById('taskDue').value || null
+  };
+  const res = await fetch('/api/admin/assign-task', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if ((await res.json()).ok) {
+    const msg = document.getElementById('taskMsg');
+    msg.textContent = I18N.assigned;
+    msg.style.color = 'var(--ok)';
+    setTimeout(() => location.reload(), 700);
+  }
+}
+</script>
+{% endblock %}

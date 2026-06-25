@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{ LANG|default('en') }}" dir="{{ DIR|default('ltr') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FactoryBrain{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+</head>
+<body>
+
+{# ---------- Reusable brand mark ---------- #}
+{% macro logo_mark() %}
+<img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FactoryBrain" width="32" height="32">
+{% endmacro %}
+
+{% block body %}{% endblock %}
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

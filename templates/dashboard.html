@@ -1,0 +1,97 @@
+{% extends "shell.html" %}
+{% set active = 'dashboard' %}
+{% block title %}Dashboard · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('dash.welcome') }}, {{ user.name.split(' ')[0] }} 👋</h1>
+    <p>{{ t('dash.welcome_sub') }}</p>
+  </div>
+  <a href="{{ url_for('add_knowledge_page') }}" class="btn btn-primary">{{ t('dash.add_btn') }}</a>
+</div>
+
+<div class="grid grid-4 mb-2">
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg></div>
+    <div class="num">{{ stats.total_knowledge }}</div>
+    <div class="lbl">{{ t('dash.stat_knowledge') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M2 20h20M4 20V9l5 3V8l5 3V7l5 3v10"/></svg></div>
+    <div class="num">{{ stats.equipment_count }}</div>
+    <div class="lbl">{{ t('dash.stat_equipment') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+    <div class="num">{{ stats.my_knowledge }}</div>
+    <div class="lbl">{{ t('dash.stat_contrib') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="num">{{ stats.open_tasks }}</div>
+    <div class="lbl">{{ t('dash.stat_open_tasks') }}</div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> {{ t('dash.todays_tasks') }}</div>
+    {% if tasks %}
+      {% for task in tasks %}
+      <div class="task-item {{ 'done' if task.done }}">
+        <div class="task-check {{ 'checked' if task.done }}" onclick="toggleTask({{ task.id }}, this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div style="flex:1">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-meta">
+            {% if task.category %}<span class="task-cat">{{ task.category }}</span>{% endif %}
+            {% if task.details %} · {{ task.details }}{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <a href="{{ url_for('my_tasks') }}" class="btn btn-ghost btn-sm mt-1">{{ t('dash.view_all_tasks') }}</a>
+    {% else %}
+      <div class="empty" style="padding:30px">
+        <p>{{ t('dash.no_tasks') }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> {{ t('dash.recent_knowledge') }}</div>
+    {% if recent %}
+      <table class="table">
+        <tbody>
+        {% for k in recent %}
+          <tr>
+            <td>
+              <b>{{ k.equipment_name }}</b><br>
+              <span class="text-xs muted">{{ k.problem_type }}</span>
+            </td>
+            <td style="text-align:right"><span class="chip sev-{{ k.severity }}">{{ t('sev.' + k.severity) }}</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <a href="{{ url_for('knowledge_list') }}" class="btn btn-ghost btn-sm mt-1">{{ t('dash.browse_kb') }}</a>
+    {% else %}
+      <div class="empty" style="padding:30px">
+        <p>{{ t('dash.no_knowledge') }} <a href="{{ url_for('add_knowledge_page') }}" style="color:var(--blue)">{{ t('dash.add_entry') }}</a>.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mt-2" style="background:var(--grad-ink);color:#fff;border:none">
+  <div class="row-between">
+    <div>
+      <h3 style="font-size:1.2rem;margin-bottom:6px">{{ t('dash.cta_title') }}</h3>
+      <p style="color:#c4cde0;font-size:.9rem">{{ t('dash.cta_sub') }}</p>
+    </div>
+    <a href="{{ url_for('ask_page') }}" class="btn" style="background:#fff;color:var(--ink)">{{ t('dash.cta_btn') }}</a>
+  </div>
+</div>
+{% endblock %}

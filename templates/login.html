@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "base.html" import logo_mark %}
+{% block title %}Sign In · FactoryBrain{% endblock %}
+
+{% block body %}
+<div class="auth-wrap">
+  <a class="lang-toggle auth-lang" href="{{ url_for('set_lang', lang='ar' if LANG == 'en' else 'en') }}">🌐 {{ t('language') }}</a>
+  <div class="auth-side">
+    <svg class="circuit" viewBox="0 0 200 200" fill="none" stroke="#38BDF8" stroke-width="1.2">
+      <circle cx="100" cy="100" r="60" opacity=".4"/>
+      <path d="M100 40v20M100 140v20M40 100h20M140 100h20M58 58l14 14M128 128l14 14M142 58l-14 14M72 128l-14 14"/>
+      <circle cx="100" cy="60" r="3" fill="#38BDF8"/><circle cx="100" cy="140" r="3" fill="#38BDF8"/>
+      <circle cx="60" cy="100" r="3" fill="#38BDF8"/><circle cx="140" cy="100" r="3" fill="#38BDF8"/>
+    </svg>
+    <div class="content">
+      <div class="brand light"><span class="mark">{{ logo_mark() }}</span><span style="color:#fff">Factory<span style="color:#38BDF8">Brain</span></span></div>
+      <h1>{{ t('auth.hero_title_login') }} <span class="accent">{{ t('auth.hero_accent_login') }}</span></h1>
+      <p class="lead">{{ t('auth.hero_lead_login') }}</p>
+    </div>
+    <div class="auth-feats">
+      <div class="auth-feat"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div><b>{{ t('auth.feat_ask') }}</b><p>{{ t('auth.feat_ask_d') }}</p></div></div>
+      <div class="auth-feat"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg></span><div><b>{{ t('auth.feat_struct') }}</b><p>{{ t('auth.feat_struct_d') }}</p></div></div>
+      <div class="auth-feat"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><div><b>{{ t('auth.feat_tasks') }}</b><p>{{ t('auth.feat_tasks_d') }}</p></div></div>
+    </div>
+  </div>
+
+  <div class="auth-main">
+    <div class="auth-card">
+      <h2>{{ t('auth.welcome_back') }}</h2>
+      <p class="sub">{{ t('auth.signin_sub') }}</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="field">
+          <label>{{ t('auth.email') }}</label>
+          <input type="email" name="email" placeholder="you@company.com" required autofocus>
+        </div>
+        <div class="field">
+          <label>{{ t('auth.password') }}</label>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">{{ t('auth.sign_in') }}</button>
+      </form>
+
+      <p class="auth-switch">{{ t('auth.new_employee') }} <a href="{{ url_for('signup') }}">{{ t('auth.create_one') }}</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

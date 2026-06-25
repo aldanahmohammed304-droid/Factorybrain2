@@ -1,0 +1,85 @@
+{% extends "shell.html" %}
+{% set active = 'admin' %}
+{% block title %}Admin Dashboard · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('adm.dash_title') }}</h1>
+    <p>{{ t('adm.dash_sub') }}</p>
+  </div>
+  {% if ai_status.ready %}<span class="badge badge-ai-on"><span class="dot"></span> AI LLM</span>
+  {% else %}<span class="badge badge-ai-off"><span class="dot"></span> {{ t('adm.demo_no_key') }}</span>{% endif %}
+</div>
+
+<div class="grid grid-4 mb-2">
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    <div class="num">{{ stats.users }}</div>
+    <div class="lbl">{{ t('adm.employees') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5z"/></svg></div>
+    <div class="num">{{ stats.knowledge }}</div>
+    <div class="lbl">{{ t('adm.knowledge_entries') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.3 2 17a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.3z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+    <div class="num">{{ stats.open_incidents }}</div>
+    <div class="lbl">{{ t('adm.open_incidents') }}</div>
+  </div>
+  <div class="stat">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="num">{{ stats.closed_incidents }}</div>
+    <div class="lbl">{{ t('adm.closed_incidents') }}</div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg> {{ t('adm.most_problematic') }}</div>
+    {% if top_equipment %}
+      {% set maxv = top_equipment[0].issues %}
+      {% for e in top_equipment %}
+      <div style="margin-bottom:14px">
+        <div class="row-between" style="margin-bottom:5px">
+          <a href="{{ url_for('equipment_detail', name=e.equipment_name) }}" style="font-weight:600;font-size:.9rem">{{ e.equipment_name }}</a>
+          <span class="muted text-sm">{{ e.issues }}</span>
+        </div>
+        <div class="bar"><span style="width: {{ (e.issues / maxv * 100)|round }}%"></span></div>
+      </div>
+      {% endfor %}
+    {% else %}<p class="muted text-sm">{{ t('adm.no_data') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 2l3 6.5 7 .8-5 4.8 1.3 7L12 17.8 5.4 21l1.3-7-5-4.8 7-.8z"/></svg> {{ t('adm.top_rated') }}</div>
+    {% if best %}
+      <table class="table">
+        <tbody>
+        {% for b in best %}
+          <tr>
+            <td><b>{{ b.equipment_name }}</b><br><span class="text-xs muted">{{ b.problem_type }}</span></td>
+            <td style="text-align:right"><span class="chip" style="background:#fff8e6;color:#c98a00">★ {{ b.avg|round(1) }} ({{ b.cnt }})</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}<p class="muted text-sm">{{ t('adm.no_rated') }}</p>{% endif %}
+  </div>
+</div>
+
+<div class="card mt-2">
+  <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> {{ t('adm.severity_dist') }}</div>
+  <div class="grid grid-4">
+    {% set sevmap = {} %}
+    {% for s in severity %}{% if sevmap.update({s.severity: s.c}) %}{% endif %}{% endfor %}
+    {% for level in ['Low','Medium','High','Critical'] %}
+    <div style="text-align:center;padding:14px;background:var(--mist);border-radius:12px">
+      <div class="num" style="font-size:1.7rem">{{ sevmap.get(level, 0) }}</div>
+      <span class="chip sev-{{ level }}" style="margin-top:8px">{{ t('sev.' + level) }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "shell.html" %}
+{% set active = 'knowledge' %}
+{% block title %}Knowledge Base · FactoryBrain{% endblock %}
+
+{% macro kcard(k) %}
+<div class="k-card">
+  <div class="k-top">
+    <div>
+      <h3>{{ k.equipment_name }}</h3>
+      <div class="k-type">{{ k.problem_type }}</div>
+    </div>
+    <span class="chip sev-{{ k.severity }}">{{ t('sev.' + k.severity) }}</span>
+  </div>
+
+  <div class="k-label">{{ t('field.cause') }}</div>
+  <div class="k-cause">{{ k.problem_cause }}</div>
+
+  {% if k.solution_steps %}
+  <div class="k-label">{{ t('field.solution_steps') }}</div>
+  <ol class="k-steps">
+    {% for s in k.solution_steps %}<li>{{ s }}</li>{% endfor %}
+  </ol>
+  {% endif %}
+
+  {% if k.prevention %}
+  <div class="k-label">{{ t('field.prevention') }}</div>
+  <div class="k-cause">{{ k.prevention }}</div>
+  {% endif %}
+
+  {% if k.keywords %}
+  <div class="k-keywords">
+    {% for kw in k.keywords %}<span>{{ kw }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="k-foot">
+    <span class="k-author">by {{ k.author or 'Unknown' }} · {{ k.created_at }}</span>
+    <div class="flex items-center">
+      <span class="stars" data-kid="{{ k.id }}">
+        {% for i in range(1,6) %}
+        <button onclick="rate({{ k.id }}, {{ i }}, this)" title="{{ i }} star{{ 's' if i>1 }}">
+          <svg viewBox="0 0 24 24" class="{{ 'star-filled' if i <= k.avg_rating|round(0,'floor') else 'star-empty' }}"><path d="M12 2l3 6.5 7 .8-5 4.8 1.3 7L12 17.8 5.4 21l1.3-7-5-4.8 7-.8z"/></svg>
+        </button>
+        {% endfor %}
+      </span>
+      <span class="rating-meta" data-meta="{{ k.id }}">{{ k.avg_rating if k.rating_count else '—' }}{% if k.rating_count %} ({{ k.rating_count }}){% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('kb.title') }}</h1>
+    <p>{{ items|length }} {{ t('kb.subtitle') }}</p>
+  </div>
+  <a href="{{ url_for('add_knowledge_page') }}" class="btn btn-primary">{{ t('kb.add_btn') }}</a>
+</div>
+
+<form class="searchbar" method="GET" action="{{ url_for('knowledge_list') }}">
+  <input type="text" name="q" value="{{ q }}" placeholder="{{ t('kb.search_ph') }}">
+  <button class="btn btn-dark" type="submit">{{ t('kb.search') }}</button>
+  {% if q %}<a href="{{ url_for('knowledge_list') }}" class="btn btn-ghost">{{ t('kb.clear') }}</a>{% endif %}
+</form>
+
+{% if items %}
+<div class="grid grid-2">
+  {% for k in items %}{{ kcard(k) }}{% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M21 21l-4.3-4.3M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/></svg>
+  <h3>{{ t('kb.no_results') if q else t('kb.no_knowledge') }}</h3>
+  <p>{{ t('kb.try_diff') if q else t('kb.start_capturing') }}</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function rate(kid, score, el) {
+  const res = await fetch('/api/rate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ knowledge_id: kid, score: score })
+  });
+  const data = await res.json();
+  if (data.ok) {
+    const stars = document.querySelector(`.stars[data-kid="${kid}"]`).querySelectorAll('svg');
+    stars.forEach((s,i) => {
+      s.classList.toggle('star-filled', (i+1) <= Math.floor(data.avg));
+      s.classList.toggle('star-empty', (i+1) > Math.floor(data.avg));
+    });
+    document.querySelector(`[data-meta="${kid}"]`).textContent = `${data.avg} (${data.count})`;
+  }
+}
+</script>
+{% endblock %}

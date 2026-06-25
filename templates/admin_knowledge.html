@@ -1,0 +1,49 @@
+{% extends "shell.html" %}
+{% set active = 'aknow' %}
+{% block title %}Knowledge Base · FactoryBrain Admin{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('adm.kb_title') }}</h1>
+    <p>{{ items|length }} {{ t('adm.kb_sub2') }}</p>
+  </div>
+</div>
+
+{% if items %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>{{ t('inc.equipment') }}</th><th>{{ t('adm.problem') }}</th><th>{{ t('field.severity') }}</th><th>{{ t('adm.author') }}</th><th>{{ t('adm.rating') }}</th><th>{{ t('eq.date') }}</th><th></th></tr></thead>
+    <tbody>
+    {% for k in items %}
+      <tr id="row-{{ k.id }}">
+        <td><b>{{ k.equipment_name }}</b></td>
+        <td>{{ k.problem_type }}</td>
+        <td><span class="chip sev-{{ k.severity }}">{{ t('sev.' + k.severity) }}</span></td>
+        <td class="text-sm muted">{{ k.author or '—' }}</td>
+        <td class="text-sm">{% if k.rating_count %}★ {{ k.avg_rating }} ({{ k.rating_count }}){% else %}—{% endif %}</td>
+        <td class="text-sm muted">{{ k.created_at }}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="del({{ k.id }})">{{ t('adm.delete') }}</button></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5z"/></svg>
+  <h3>{{ t('kb.no_knowledge') }}</h3>
+  <p>{{ t('adm.kb_empty_sub') }}</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function del(id) {
+  if (!confirm({{ t('adm.confirm_delete')|tojson }})) return;
+  const res = await fetch('/api/admin/delete-knowledge', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  if ((await res.json()).ok) document.getElementById('row-'+id).remove();
+}
+</script>
+{% endblock %}

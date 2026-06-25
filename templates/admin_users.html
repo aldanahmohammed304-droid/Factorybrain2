@@ -1,0 +1,39 @@
+{% extends "shell.html" %}
+{% set active = 'users' %}
+{% block title %}Employees · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('adm.emp_title') }}</h1>
+    <p>{{ t('adm.emp_sub') }}</p>
+  </div>
+  <a href="{{ url_for('admin_tasks') }}" class="btn btn-primary">{{ t('adm.tasks_title') }}</a>
+</div>
+
+{% if users %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>{{ t('adm.emp_name') }}</th><th>{{ t('adm.emp_email') }}</th><th>{{ t('adm.emp_job') }}</th><th>{{ t('adm.emp_contrib') }}</th><th>{{ t('nav.my_tasks') }}</th><th>{{ t('adm.emp_joined') }}</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td><div class="flex items-center gap-2"><div class="avatar" style="width:32px;height:32px;font-size:.78rem">{{ u.name[0]|upper }}</div><b>{{ u.name }}</b></div></td>
+        <td class="text-sm muted">{{ u.email }}</td>
+        <td class="text-sm">{{ u.job_title or '—' }}</td>
+        <td><span class="chip" style="background:#e8f0ff;color:var(--blue)">{{ u.kcount }} {{ t('eq.entries') }}</span></td>
+        <td class="text-sm">{{ u.tcount }}</td>
+        <td class="text-sm muted">{{ u.created_at[:10] }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+  <h3>{{ t('adm.no_employees') }}</h3>
+  <p>{{ t('adm.emp_sub') }}</p>
+</div>
+{% endif %}
+{% endblock %}

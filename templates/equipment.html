@@ -1,0 +1,35 @@
+{% extends "shell.html" %}
+{% set active = 'equipment' %}
+{% block title %}Equipment · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('eq.title') }}</h1>
+    <p>{{ t('eq.subtitle') }}</p>
+  </div>
+</div>
+
+{% if equipment %}
+<div class="grid grid-3">
+  {% for e in equipment %}
+  <a href="{{ url_for('equipment_detail', name=e.equipment_name) }}" class="k-card" style="display:block">
+    <div class="k-top">
+      <div class="ic" style="width:42px;height:42px;border-radius:11px;background:var(--mist);display:grid;place-items:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><path d="M2 20h20M4 20V9l5 3V8l5 3V7l5 3v10"/></svg>
+      </div>
+      {% if e.critical %}<span class="chip sev-Critical">{{ e.critical }} {{ t('sev.Critical') }}</span>{% endif %}
+    </div>
+    <h3 style="margin-top:12px">{{ e.equipment_name }}</h3>
+    <p class="muted text-sm mt-1">{{ e.issues }} {{ t('eq.entries') }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M2 20h20M4 20V9l5 3V8l5 3V7l5 3v10"/></svg>
+  <h3>{{ t('eq.no_equipment') }}</h3>
+  <p>{{ t('eq.subtitle') }}</p>
+</div>
+{% endif %}
+{% endblock %}

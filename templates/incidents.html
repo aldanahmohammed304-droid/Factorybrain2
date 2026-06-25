@@ -1,0 +1,101 @@
+{% extends "shell.html" %}
+{% set active = 'incidents' %}
+{% block title %}Incident Log · FactoryBrain{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ t('inc.title') }}</h1>
+    <p>{{ t('inc.subtitle') }}</p>
+  </div>
+  <button class="btn btn-primary" onclick="openModal('incModal')">{{ t('inc.log_btn') }}</button>
+</div>
+
+{% if incidents %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>{{ t('inc.equipment') }}</th><th>{{ t('inc.description') }}</th><th>{{ t('inc.downtime') }}</th><th>{{ t('inc.reported_by') }}</th><th>{{ t('inc.status') }}</th><th></th></tr></thead>
+    <tbody>
+    {% for i in incidents %}
+      <tr>
+        <td><b>{{ i.equipment_name }}</b></td>
+        <td>{{ i.description }}{% if i.solution_used %}<br><span class="text-xs muted">{{ t('inc.fix') }}: {{ i.solution_used }}</span>{% endif %}</td>
+        <td class="text-sm">{{ i.downtime_minutes }} {{ t('inc.minutes') }}</td>
+        <td class="text-sm muted">{{ i.reporter or '—' }}</td>
+        <td><span class="chip st-{{ i.status }}">{{ t('inc.open') if i.status == 'open' else t('inc.closed') }}</span></td>
+        <td>{% if i.status == 'open' %}<button class="btn btn-ghost btn-sm" onclick="openClose({{ i.id }})">{{ t('inc.close') }}</button>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M10.3 3.3 2 17a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+  <h3>{{ t('inc.no_incidents') }}</h3>
+  <p>{{ t('inc.no_incidents_sub') }}</p>
+</div>
+{% endif %}
+
+<!-- Create modal -->
+<div class="modal-overlay" id="incModal">
+  <div class="modal">
+    <div class="modal-head"><h3>{{ t('inc.modal_title') }}</h3><button onclick="closeModal('incModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field">
+        <label>{{ t('inc.equipment') }}</label>
+        <input list="eqlist" id="incEquipment" placeholder="{{ t('inc.pick_equipment') }}">
+        <datalist id="eqlist">{% for e in equipment %}<option value="{{ e.equipment_name }}">{% endfor %}</datalist>
+      </div>
+      <div class="field"><label>{{ t('inc.description') }}</label><textarea id="incDesc" rows="3" placeholder="{{ t('inc.what_happened') }}"></textarea></div>
+      <div class="field"><label>{{ t('inc.downtime_min') }}</label><input type="number" id="incDowntime" value="0" min="0"></div>
+      <div class="field"><label>{{ t('inc.solution_used') }} <span class="muted text-xs">({{ t('inc.if_resolved') }})</span></label><textarea id="incSolution" rows="2"></textarea></div>
+      <div class="field"><label>{{ t('inc.status') }}</label><select id="incStatus"><option value="open">{{ t('inc.open') }}</option><option value="closed">{{ t('inc.closed') }}</option></select></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('incModal')">{{ t('inc.cancel') }}</button>
+      <button class="btn btn-primary" onclick="saveIncident()"><span class="btn-label">{{ t('save') }}</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Close modal -->
+<div class="modal-overlay" id="closeModal">
+  <div class="modal">
+    <div class="modal-head"><h3>{{ t('inc.close_title') }}</h3><button onclick="closeModal('closeModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field"><label>{{ t('inc.solution_used') }}</label><textarea id="closeSolution" rows="3" placeholder="{{ t('inc.how_resolved') }}"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('closeModal')">{{ t('inc.cancel') }}</button>
+      <button class="btn btn-primary" onclick="confirmClose()"><span class="btn-label">{{ t('inc.mark_closed') }}</span></button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let closingId = null;
+function openClose(id){ closingId = id; openModal('closeModal'); }
+
+async function saveIncident() {
+  const payload = {
+    equipment_name: document.getElementById('incEquipment').value.trim() || 'Unknown',
+    description: document.getElementById('incDesc').value.trim(),
+    downtime_minutes: document.getElementById('incDowntime').value || 0,
+    solution_used: document.getElementById('incSolution').value.trim(),
+    status: document.getElementById('incStatus').value
+  };
+  if (!payload.description) { alert({{ t('inc.add_desc')|tojson }}); return; }
+  const res = await fetch('/api/incident', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if ((await res.json()).ok) location.reload();
+}
+
+async function confirmClose() {
+  const res = await fetch('/api/incident-close', {method:'POST',headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ id: closingId, solution_used: document.getElementById('closeSolution').value.trim() })});
+  if ((await res.json()).ok) location.reload();
+}
+</script>
+{% endblock %}

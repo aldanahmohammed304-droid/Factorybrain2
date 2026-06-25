@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "base.html" import logo_mark %}
+
+{% macro icon(name) %}
+  {% if name == 'dashboard' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+  {% elif name == 'add' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+  {% elif name == 'ask' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  {% elif name == 'knowledge' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+  {% elif name == 'equipment' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20V9l5 3V8l5 3V7l5 3v10"/><circle cx="6" cy="17" r="1"/><circle cx="11" cy="17" r="1"/></svg>
+  {% elif name == 'incidents' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.3 2 17a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+  {% elif name == 'tasks' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  {% elif name == 'users' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  {% elif name == 'out' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+  {% elif name == 'menu' %}<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  {% endif %}
+{% endmacro %}
+
+{% block body %}
+<div class="mobile-bar">
+  <div class="brand light"><span class="mark">{{ logo_mark() }}</span><span style="color:#fff">Factory<span style="color:#38BDF8">Brain</span></span></div>
+  <button onclick="document.querySelector('.sidebar').classList.toggle('open')">{{ icon('menu') }}</button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand light">
+      <span class="mark">{{ logo_mark() }}</span>
+      <span>Factory<span>Brain</span></span>
+    </div>
+
+    {% if user.role == 'admin' %}
+      <div class="nav-group-label">{{ t('nav.admin') }}</div>
+      <a class="nav-link {{ 'active' if active=='admin' }}" href="{{ url_for('admin_dashboard') }}">{{ icon('dashboard') }} {{ t('nav.dashboard') }}</a>
+      <a class="nav-link {{ 'active' if active=='users' }}" href="{{ url_for('admin_users') }}">{{ icon('users') }} {{ t('nav.employees') }}</a>
+      <a class="nav-link {{ 'active' if active=='atasks' }}" href="{{ url_for('admin_tasks') }}">{{ icon('tasks') }} {{ t('nav.assign_tasks') }}</a>
+      <a class="nav-link {{ 'active' if active=='aknow' }}" href="{{ url_for('admin_knowledge') }}">{{ icon('knowledge') }} {{ t('nav.knowledge_base') }}</a>
+      <a class="nav-link {{ 'active' if active=='incidents' }}" href="{{ url_for('incidents_page') }}">{{ icon('incidents') }} {{ t('nav.incidents') }}</a>
+      <a class="nav-link {{ 'active' if active=='equipment' }}" href="{{ url_for('equipment_list') }}">{{ icon('equipment') }} {{ t('nav.equipment') }}</a>
+    {% else %}
+      <div class="nav-group-label">{{ t('nav.workspace') }}</div>
+      <a class="nav-link {{ 'active' if active=='dashboard' }}" href="{{ url_for('dashboard') }}">{{ icon('dashboard') }} {{ t('nav.dashboard') }}</a>
+      <a class="nav-link {{ 'active' if active=='add' }}" href="{{ url_for('add_knowledge_page') }}">{{ icon('add') }} {{ t('nav.add_knowledge') }}</a>
+      <a class="nav-link {{ 'active' if active=='ask' }}" href="{{ url_for('ask_page') }}">{{ icon('ask') }} {{ t('nav.ask_ai') }}</a>
+      <a class="nav-link {{ 'active' if active=='knowledge' }}" href="{{ url_for('knowledge_list') }}">{{ icon('knowledge') }} {{ t('nav.knowledge_base') }}</a>
+      <div class="nav-group-label">{{ t('nav.operations') }}</div>
+      <a class="nav-link {{ 'active' if active=='equipment' }}" href="{{ url_for('equipment_list') }}">{{ icon('equipment') }} {{ t('nav.equipment') }}</a>
+      <a class="nav-link {{ 'active' if active=='incidents' }}" href="{{ url_for('incidents_page') }}">{{ icon('incidents') }} {{ t('nav.incident_log') }}</a>
+      <a class="nav-link {{ 'active' if active=='tasks' }}" href="{{ url_for('my_tasks') }}">{{ icon('tasks') }} {{ t('nav.my_tasks') }}</a>
+    {% endif %}
+
+    <div class="spacer"></div>
+    <div class="side-user">
+      <div class="avatar">{{ user.name[0]|upper }}</div>
+      <div class="meta">
+        <b>{{ user.name }}</b>
+        <span>{{ user.job_title or user.role|capitalize }}</span>
+      </div>
+    </div>
+    <div class="side-actions">
+      <a class="side-btn" href="{{ url_for('set_lang', lang='ar' if LANG == 'en' else 'en') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        {{ t('language') }}
+      </a>
+      <a class="side-btn signout" href="{{ url_for('logout') }}">
+        {{ icon('out') }} {{ t('sign_out') }}
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
