@@ -683,7 +683,8 @@ def inject_globals():
         "DIR": "rtl" if lang == "ar" else "ltr",
         "t": lambda key: translate(key, lang),
     }
-
+with app.app_context():
+    init_db()
 
 if __name__ == "__main__":
     init_db()
